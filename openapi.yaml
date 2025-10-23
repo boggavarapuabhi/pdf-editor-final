@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: PDF Text Editor API
+  version: "1.0.0"
+servers:
+  - url: https://YOUR-RENDER-URL
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /upload:
+    post:
+      summary: Upload PDF file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_id:
+                    type: string
+  /edit_replace:
+    post:
+      summary: Replace text in PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file_id: { type: string }
+                find: { type: string }
+                replace: { type: string }
+                page: { type: integer, description: "optional 1-based page number" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revision_id: { type: string }
+                  replaced: { type: integer }
+  /download:
+    get:
+      summary: Download edited PDF
+      parameters:
+        - in: query
+          name: revision_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: PDF file
+          content:
+            application/pdf: {}
